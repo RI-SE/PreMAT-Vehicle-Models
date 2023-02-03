@@ -12,23 +12,21 @@ from libs import CarDescription, StanleyController, generate_cubic_spline
 
 class Simulation:
 
-    def __init__(self):
-
-        fps = 50.0
+    def __init__(self, dt: float, map_size_x: int, max_size_y: int, frames: int, fps: int, loop: bool):
 
         self.dt = 1/fps
-        self.map_size_x = 70
-        self.map_size_y = 40
-        self.frames = 2500
-        self.loop = False
+        self.map_size_x = map_size_x
+        self.map_size_y = max_size_y
+        self.frames = frames
+        self.loop = loop
 
 
 class Path:
 
-    def __init__(self):
+    def __init__(self, file: str):
 
         # Get path to waypoints.csv
-        with open('data/waypoints.csv', newline='') as f:
+        with open(file, newline='') as f:
             rows = list(reader(f, delimiter=','))
 
         ds = 0.05
