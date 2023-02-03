@@ -12,7 +12,7 @@ from libs import CarDescription, StanleyController, generate_cubic_spline
 
 class Simulation:
 
-    def __init__(self, dt: float, map_size_x: int, max_size_y: int, frames: int, fps: int, loop: bool):
+    def __init__(self, map_size_x: int, max_size_y: int, frames: int, fps: int, loop: bool = False):
 
         self.dt = 1/fps
         self.map_size_x = map_size_x
