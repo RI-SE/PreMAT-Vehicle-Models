@@ -12,23 +12,21 @@ from libs import CarDescription, StanleyController, generate_cubic_spline
 
 class Simulation:
 
-    def __init__(self):
-
-        fps = 50.0
+    def __init__(self, map_size_x: int, max_size_y: int, frames: int, fps: int, loop: bool = False):
 
         self.dt = 1/fps
-        self.map_size_x = 70
-        self.map_size_y = 40
-        self.frames = 2500
-        self.loop = False
+        self.map_size_x = map_size_x
+        self.map_size_y = max_size_y
+        self.frames = frames
+        self.loop = loop
 
 
 class Path:
 
-    def __init__(self):
+    def __init__(self, file: str):
 
         # Get path to waypoints.csv
-        with open('data/waypoints.csv', newline='') as f:
+        with open(file, newline='') as f:
             rows = list(reader(f, delimiter=','))
 
         ds = 0.05
@@ -159,55 +157,3 @@ def animate(frame, fargs):
     # plt.savefig(f'image/visualisation_{frame:03}.png', dpi=300)
 
     return car_outline, front_right_wheel, rear_right_wheel, front_left_wheel, rear_left_wheel, rear_axle, target,
-
-
-def main():
-    
-    sim  = Simulation()
-    path = Path()
-    car  = Car(path.px[0], path.py[0], path.pyaw[0], path.px, path.py, path.pyaw, sim.dt)
-
-    interval = sim.dt * 10**3
-
-    fig = plt.figure()
-    ax = plt.axes()
-    ax.set_aspect('equal')
-
-    road = plt.Circle((0, 0), 50, color='gray', fill=False, linewidth=30)
-    ax.add_patch(road)
-    ax.plot(path.px, path.py, '--', color='gold')
-
-    empty              = ([], [])
-    target,            = ax.plot(*empty, '+r')
-    car_outline,       = ax.plot(*empty, color=car.colour)
-    front_right_wheel, = ax.plot(*empty, color=car.colour)
-    rear_right_wheel,  = ax.plot(*empty, color=car.colour)
-    front_left_wheel,  = ax.plot(*empty, color=car.colour)
-    rear_left_wheel,   = ax.plot(*empty, color=car.colour)
-    rear_axle,         = ax.plot(car.x, car.y, '+', color=car.colour, markersize=2)
-    annotation         = ax.annotate(f'{car.x:.1f}, {car.y:.1f}', xy=(car.x, car.y + 5), color='black', annotation_clip=False)
-
-    fargs = [Fargs(
-        ax=ax,
-        sim=sim,
-        path=path,
-        car=car,
-        car_outline=car_outline,
-        front_right_wheel=front_right_wheel,
-        front_left_wheel=front_left_wheel,
-        rear_right_wheel=rear_right_wheel,
-        rear_left_wheel=rear_left_wheel,
-        rear_axle=rear_axle,
-        annotation=annotation,
-        target=target
-    )]
-
-    _ = FuncAnimation(fig, animate, frames=sim.frames, init_func=lambda: None, fargs=fargs, interval=interval, repeat=sim.loop)
-    # anim.save('animation.gif', writer='imagemagick', fps=50)
-    
-    plt.grid()
-    plt.show()
-
-
-if __name__ == '__main__':
-    main()
