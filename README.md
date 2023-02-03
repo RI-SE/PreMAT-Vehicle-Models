@@ -1,5 +1,6 @@
 # Kinematic Bicycle Model
 
+
 ![codeql.yml](https://github.com/winstxnhdw/KinematicBicycleModel/actions/workflows/codeql.yml/badge.svg)
 
 <div align="center">
