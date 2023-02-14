@@ -7,7 +7,7 @@ def show_animation():
     
     sim  = Simulation(map_size_x=70, max_size_y=40, frames=2500, fps=50)
     path = Path("data/waypoints.csv")
-    car  = Car(path.px[0], path.py[0], path.pyaw[0], path.px, path.py, path.pyaw, sim.dt)
+    car  = Car(path.px[0], path.py[0], path.pyaw[0], path.px, path.py, path.pyaw, sim.dt, "DubinsCar")
 
     interval = sim.dt * 10**3
 

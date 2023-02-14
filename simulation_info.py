@@ -6,8 +6,9 @@ from math import radians
 from matplotlib import pyplot as plt
 from matplotlib.animation import FuncAnimation
 
-from kinematic_model import KinematicBicycleModel
+from models.bicycle_model import BicycleModel
 from libs import CarDescription, StanleyController, generate_cubic_spline
+from models.model_factory import ModelFactory
 
 
 class Simulation:
@@ -36,7 +37,7 @@ class Path:
 
 class Car:
 
-    def __init__(self, init_x, init_y, init_yaw, px, py, pyaw, delta_time):
+    def __init__(self, init_x, init_y, init_yaw, px, py, pyaw, delta_time, model):
 
         # Model parameters
         self.x = init_x
@@ -76,7 +77,7 @@ class Car:
         rear_overhang = 0.5 * (overall_length - wheelbase)
 
         self.tracker = StanleyController(self.k, self.ksoft, self.kyaw, self.ksteer, max_steer, wheelbase, self.px, self.py, self.pyaw)
-        self.kinematic_bicycle_model = KinematicBicycleModel(wheelbase, max_steer, self.delta_time)
+        self.model = ModelFactory(wheelbase, max_steer, self.delta_time).create_model(model)
         self.description = CarDescription(overall_length, overall_width, rear_overhang, tyre_diameter, tyre_width, axle_track, wheelbase)
 
     
@@ -93,9 +94,9 @@ class Car:
 
     def drive(self):
         
-        acceleration = 0 if self.time > self.time_to_reach_target_velocity else self.get_required_acceleration()
+        acceleration = 10 # = 0 if self.time > self.time_to_reach_target_velocity else self.get_required_acceleration()
         self.wheel_angle, self.target_id, self.crosstrack_error = self.tracker.stanley_control(self.x, self.y, self.yaw, self.velocity, self.wheel_angle)
-        self.x, self.y, self.yaw, self.velocity, _, _ = self.kinematic_bicycle_model.update(self.x, self.y, self.yaw, self.velocity, acceleration, self.wheel_angle)
+        self.x, self.y, self.yaw, self.velocity, _, _ = self.model.update(self.x, self.y, self.yaw, self.velocity, acceleration, self.wheel_angle)
 
         print(f"Cross-track term: {self.crosstrack_error}{' '*10}", end="\r")
 
