@@ -31,7 +31,11 @@ class Path:
             rows = list(reader(f, delimiter=','))
 
         ds = 0.05
-        x, y = [[float(i) for i in row] for row in zip(*rows[1:])]
+
+        _, x_temp, y_temp, _ = [[float(i) for i in row] for row in zip(*rows[1:])]
+        non_duplicates = [i for i in range(1, len(x_temp)) if x_temp[i] != x_temp[i - 1]]
+        x = [x_temp[i] for i in non_duplicates]
+        y = [y_temp[i] for i in non_duplicates]
         self.px, self.py, self.pyaw, _ = generate_cubic_spline(x, y, ds)
 
 
@@ -48,8 +52,8 @@ class Car:
         self.velocity = 0.0
         self.wheel_angle = 0.0
         self.angular_velocity = 0.0
-        max_steer = radians(33)
-        wheelbase = 2.96
+        max_steer = radians(31)
+        wheelbase = 0.406
 
         # Acceleration parameters
         target_velocity = 10.0
@@ -69,11 +73,11 @@ class Car:
 
         # Description parameters
         self.colour = 'black'
-        overall_length = 4.97
-        overall_width = 1.964
-        tyre_diameter = 0.4826
-        tyre_width = 0.265
-        axle_track = 1.7
+        overall_length = 0.71
+        overall_width = 0.30
+        tyre_diameter = 0.107
+        tyre_width = 0.053
+        axle_track = 0.30 - 0.053
         rear_overhang = 0.5 * (overall_length - wheelbase)
 
         self.tracker = StanleyController(self.k, self.ksoft, self.kyaw, self.ksteer, max_steer, wheelbase, self.px, self.py, self.pyaw)
@@ -94,7 +98,7 @@ class Car:
 
     def drive(self):
         
-        acceleration = 10 # = 0 if self.time > self.time_to_reach_target_velocity else self.get_required_acceleration()
+        acceleration = 1 # = 0 if self.time > self.time_to_reach_target_velocity else self.get_required_acceleration()
         self.wheel_angle, self.target_id, self.crosstrack_error = self.tracker.stanley_control(self.x, self.y, self.yaw, self.velocity, self.wheel_angle)
         self.x, self.y, self.yaw, self.velocity, _, _ = self.model.update(self.x, self.y, self.yaw, self.velocity, acceleration, self.wheel_angle)
 
