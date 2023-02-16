@@ -49,7 +49,7 @@ class Path:
 
 class Car:
 
-    def __init__(self, init_x, init_y, init_yaw, px, py, pyaw, acceleration, delta_time, vmax, model):
+    def __init__(self, init_x, init_y, init_yaw, px, py, pyaw, acceleration, delta_time, vmax, model, vconstant = False):
 
         # Model parameters
         self.x = init_x
@@ -58,7 +58,10 @@ class Car:
         self.acceleration = acceleration
         self.delta_time = delta_time
         self.time = 0.0
-        self.velocity = vmax / 2
+        if vconstant:
+            self.velocity = vmax
+        else:
+            self.velocity = vmax / 2
         self.vmax = vmax
         self.wheel_angle = 0.0
         self.angular_velocity = 0.0
@@ -94,7 +97,6 @@ class Car:
     def get_acceleration(self, time):
         
         acceleration = self.acceleration[time]
-        # return acceleration * 9.82
 
         tol = 0.1
         if acceleration <= -tol:
