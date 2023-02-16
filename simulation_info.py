@@ -78,7 +78,9 @@ class Car:
         self.ksteer = 0.0
         self.crosstrack_error = None
         self.target_id = None
+        self.prev_target_id = None
         self.iteration = 0
+        self.continue_animation = True
 
         # Description parameters
         self.colour = 'black'
@@ -112,11 +114,21 @@ class Car:
         return self.description.plot_car(self.x, self.y, self.yaw, self.wheel_angle)
 
 
+    def gen(self):
+        while self.continue_animation:
+            yield len(self.acceleration)
+
+
     def drive(self):
         
         acceleration = self.get_acceleration(self.iteration) if self.velocity < self.vmax else 0
         self.wheel_angle, self.target_id, self.crosstrack_error = self.tracker.stanley_control(self.x, self.y, self.yaw, self.velocity, self.wheel_angle)
         self.x, self.y, self.yaw, self.velocity, _, _ = self.model.update(self.x, self.y, self.yaw, self.velocity, acceleration, self.wheel_angle)
+        
+        if self.target_id == self.prev_target_id:
+            self.continue_animation = False
+
+        self.prev_target_id = self.target_id
         self.iteration += 1
 
         print(f"Cross-track term: {self.crosstrack_error}{' '*10}", end="\r")
