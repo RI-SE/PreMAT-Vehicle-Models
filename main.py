@@ -9,7 +9,7 @@ def show_animation():
     sim  = Simulation(path.delta_time, max_size_x = 5, max_size_y = 5, frames = len(path.acceleration))
     car  = Car(path.px[0], path.py[0], path.pyaw[0],
                path.px, path.py, path.pyaw, path.acceleration,
-               path.delta_time, 3.64, "BicycleModel")
+               path.delta_time, 3.64, "BicycleModel", True)
 
     interval = sim.dt * 10**3
 
@@ -44,7 +44,7 @@ def show_animation():
         target=target
     )]
 
-    _ = FuncAnimation(fig, animate, frames=sim.frames, init_func=lambda: None, fargs=fargs, interval=interval, repeat=sim.loop)
+    _ = FuncAnimation(fig, animate, frames=car.gen, init_func=lambda: None, fargs=fargs, interval=interval, repeat=sim.loop)
     # anim.save('animation.gif', writer='imagemagick', fps=50)
     
     plt.grid()
