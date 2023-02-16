@@ -58,7 +58,7 @@ class Car:
         self.acceleration = acceleration
         self.delta_time = delta_time
         self.time = 0.0
-        self.velocity = 0.0
+        self.velocity = vmax / 2
         self.vmax = vmax
         self.wheel_angle = 0.0
         self.angular_velocity = 0.0
@@ -92,13 +92,14 @@ class Car:
 
     
     def get_acceleration(self, time):
-
+        
         acceleration = self.acceleration[time]
+        # return acceleration * 9.82
 
-        tol = 0.3
+        tol = 0.1
         if acceleration <= -tol:
             return acceleration * 9.82
-        elif acceleration > -tol and acceleration < 0:
+        elif acceleration > -tol and acceleration < tol:
             return 0
         else:
             return acceleration * 9.82

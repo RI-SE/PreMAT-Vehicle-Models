@@ -5,7 +5,7 @@ from matplotlib.animation import FuncAnimation
 
 def show_animation():
     
-    path = Path("data/data3.csv")
+    path = Path("data/data5.csv")
     sim  = Simulation(path.delta_time, max_size_x = 5, max_size_y = 5, frames = len(path.acceleration))
     car  = Car(path.px[0], path.py[0], path.pyaw[0],
                path.px, path.py, path.pyaw, path.acceleration,
