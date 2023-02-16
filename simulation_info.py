@@ -13,10 +13,10 @@ from models.model_factory import ModelFactory
 
 class Simulation:
 
-    def __init__(self, map_size_x: int, max_size_y: int, frames: int, fps: int, loop: bool = False):
+    def __init__(self, dt: float, max_size_x: int, max_size_y: int, frames: int, loop: bool = False):
 
-        self.dt = 1/fps
-        self.map_size_x = map_size_x
+        self.dt = dt
+        self.map_size_x = max_size_x
         self.map_size_y = max_size_y
         self.frames = frames
         self.loop = loop
@@ -31,30 +31,39 @@ class Path:
             rows = list(reader(f, delimiter=','))
 
         ds = 0.05
-        x, y = [[float(i) for i in row] for row in zip(*rows[1:])]
+
+        time_temp, x_temp, y_temp, acceleration_temp = [[float(i) for i in row] for row in zip(*rows[1:])]
+        non_duplicates = [i for i in range(1, len(x_temp)) if x_temp[i] != x_temp[i - 1]]
+        
+        x = [x_temp[i] for i in non_duplicates]
+        y = [y_temp[i] for i in non_duplicates]
+        
+        time = [time_temp[i] for i in non_duplicates]
+        self.delta_time = time[-1] / len(time)
+        
+        acceleration = [acceleration_temp[i] for i in non_duplicates]
+        self.acceleration = acceleration
+
         self.px, self.py, self.pyaw, _ = generate_cubic_spline(x, y, ds)
 
 
 class Car:
 
-    def __init__(self, init_x, init_y, init_yaw, px, py, pyaw, delta_time, model):
+    def __init__(self, init_x, init_y, init_yaw, px, py, pyaw, acceleration, delta_time, vmax, model):
 
         # Model parameters
         self.x = init_x
         self.y = init_y
         self.yaw = init_yaw
+        self.acceleration = acceleration
         self.delta_time = delta_time
         self.time = 0.0
-        self.velocity = 0.0
+        self.velocity = vmax / 2
+        self.vmax = vmax
         self.wheel_angle = 0.0
         self.angular_velocity = 0.0
-        max_steer = radians(33)
-        wheelbase = 2.96
-
-        # Acceleration parameters
-        target_velocity = 10.0
-        self.time_to_reach_target_velocity = 5.0
-        self.required_acceleration = target_velocity / self.time_to_reach_target_velocity
+        max_steer = radians(31)
+        wheelbase = 0.406
 
         # Tracker parameters
         self.px = px
@@ -66,14 +75,15 @@ class Car:
         self.ksteer = 0.0
         self.crosstrack_error = None
         self.target_id = None
+        self.iteration = 0
 
         # Description parameters
         self.colour = 'black'
-        overall_length = 4.97
-        overall_width = 1.964
-        tyre_diameter = 0.4826
-        tyre_width = 0.265
-        axle_track = 1.7
+        overall_length = 0.71
+        overall_width = 0.30
+        tyre_diameter = 0.107
+        tyre_width = 0.053
+        axle_track = 0.30 - 0.053
         rear_overhang = 0.5 * (overall_length - wheelbase)
 
         self.tracker = StanleyController(self.k, self.ksoft, self.kyaw, self.ksteer, max_steer, wheelbase, self.px, self.py, self.pyaw)
@@ -81,10 +91,18 @@ class Car:
         self.description = CarDescription(overall_length, overall_width, rear_overhang, tyre_diameter, tyre_width, axle_track, wheelbase)
 
     
-    def get_required_acceleration(self):
+    def get_acceleration(self, time):
+        
+        acceleration = self.acceleration[time]
+        # return acceleration * 9.82
 
-        self.time += self.delta_time
-        return self.required_acceleration
+        tol = 0.1
+        if acceleration <= -tol:
+            return acceleration * 9.82
+        elif acceleration > -tol and acceleration < tol:
+            return 0
+        else:
+            return acceleration * 9.82
     
 
     def plot_car(self):
@@ -94,9 +112,10 @@ class Car:
 
     def drive(self):
         
-        acceleration = 10 # = 0 if self.time > self.time_to_reach_target_velocity else self.get_required_acceleration()
+        acceleration = self.get_acceleration(self.iteration) if self.velocity < self.vmax else 0
         self.wheel_angle, self.target_id, self.crosstrack_error = self.tracker.stanley_control(self.x, self.y, self.yaw, self.velocity, self.wheel_angle)
         self.x, self.y, self.yaw, self.velocity, _, _ = self.model.update(self.x, self.y, self.yaw, self.velocity, acceleration, self.wheel_angle)
+        self.iteration += 1
 
         print(f"Cross-track term: {self.crosstrack_error}{' '*10}", end="\r")
 

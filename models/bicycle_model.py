@@ -34,7 +34,7 @@ class BicycleModel(Model):
         angular_velocity (int) : vehicle's angular velocity [rad/s]
         """
         
-        friction_road = 0.0 
+        friction_road = 0.0
         friction_air = 0.0
 
         # Compute the local velocity in the x-axis

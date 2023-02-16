@@ -5,9 +5,11 @@ from matplotlib.animation import FuncAnimation
 
 def show_animation():
     
-    sim  = Simulation(map_size_x=70, max_size_y=40, frames=2500, fps=50)
-    path = Path("data/waypoints.csv")
-    car  = Car(path.px[0], path.py[0], path.pyaw[0], path.px, path.py, path.pyaw, sim.dt, "DubinsCar")
+    path = Path("data/data5.csv")
+    sim  = Simulation(path.delta_time, max_size_x = 5, max_size_y = 5, frames = len(path.acceleration))
+    car  = Car(path.px[0], path.py[0], path.pyaw[0],
+               path.px, path.py, path.pyaw, path.acceleration,
+               path.delta_time, 3.64, "BicycleModel")
 
     interval = sim.dt * 10**3
 
@@ -15,8 +17,6 @@ def show_animation():
     ax = plt.axes()
     ax.set_aspect('equal')
 
-    road = plt.Circle((0, 0), 50, color='gray', fill=False, linewidth=30)
-    ax.add_patch(road)
     ax.plot(path.px, path.py, '--', color='gold')
 
     empty              = ([], [])
