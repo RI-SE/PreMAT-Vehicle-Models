@@ -55,6 +55,7 @@ def box_plot(data: dict, title: str):
         legend.append(mpatches.Patch(color = colour, label = name))
 
 
+    ax.set_ylabel("[m]")
     ax.legend(handles = legend, loc = "upper left")
     ax.set_title(title)
 
