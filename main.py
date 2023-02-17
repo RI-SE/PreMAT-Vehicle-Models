@@ -78,7 +78,7 @@ if __name__ == '__main__':
     plt.show()
 
     # For showing an animation of a simulation
-    # sim = VehicleSimulation("data/data5.csv", "DubinsCar", 3.75, True)
+    # sim = VehicleSimulation("data5.csv", "DubinsCar", 3.75, True)
     # sim.show_animation()
 
 
