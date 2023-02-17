@@ -4,13 +4,13 @@ from matplotlib.animation import FuncAnimation
 
 import numpy as np
 
-class Main:
-    def __init__(self):
-        self.path = Path("data/data5.csv")
+class VehicleSimulation:
+    def __init__(self, data: str, model: str, vmax: float, constant_velocity: bool = False):
+        self.path = Path(data)
         self.sim  = Simulation(self.path.delta_time, max_size_x = 5, max_size_y = 5, frames = len(self.path.acceleration))
         self.car  = Car(self.path.px[0], self.path.py[0], self.path.pyaw[0],
                         self.path.px, self.path.py, self.path.pyaw, self.path.acceleration,
-                        self.path.delta_time, 3.64, "BicycleModel")
+                        self.path.delta_time, self.path.time[-1], vmax, model, constant_velocity)
 
 
     def show_animation(self):
@@ -62,13 +62,17 @@ class Main:
         while self.car.continue_animation:
             self.car.drive()
         
-        print("")
         print(f"Sum, all cross-track terms: {sum(self.car.all_crosstrack_errors[0:-1])}")
         print(f"Mean, all cross-track terms: {np.mean(self.car.all_crosstrack_errors[0:-1])}")
         print(f"Standard deviation, all cross-track terms: {np.std(self.car.all_crosstrack_errors[0:-1])}")
 
 
 if __name__ == '__main__':
-    main = Main()
-    # main.show_animation()
+    data = "data/data5.csv"
+    model = "BicycleModel"
+    vmax = 3.75
+    constant_velocity = False
+
+    main = VehicleSimulation(data, model, vmax, constant_velocity)
+    main.show_animation()
     main.calculate_error()

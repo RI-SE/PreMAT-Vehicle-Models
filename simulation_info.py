@@ -38,8 +38,8 @@ class Path:
         x = [x_temp[i] for i in non_duplicates]
         y = [y_temp[i] for i in non_duplicates]
         
-        time = [time_temp[i] for i in non_duplicates]
-        self.delta_time = time[-1] / len(time)
+        self.time = [time_temp[i] for i in non_duplicates]
+        self.delta_time = self.time[-1] / len(self.time)
         
         acceleration = [acceleration_temp[i] for i in non_duplicates]
         self.acceleration = acceleration
@@ -49,7 +49,7 @@ class Path:
 
 class Car:
 
-    def __init__(self, init_x, init_y, init_yaw, px, py, pyaw, acceleration, delta_time, vmax, model, vconstant = False):
+    def __init__(self, init_x, init_y, init_yaw, px, py, pyaw, acceleration, delta_time, max_time, vmax, model, vconstant = False):
 
         # Model parameters
         self.x = init_x
@@ -58,6 +58,7 @@ class Car:
         self.acceleration = acceleration
         self.delta_time = delta_time
         self.time = 0.0
+        self.max_time = max_time
         if vconstant:
             self.velocity = vmax
         else:
@@ -100,15 +101,8 @@ class Car:
     def get_acceleration(self, time):
         
         acceleration = self.acceleration[time]
+        return acceleration * 9.82
 
-        tol = 0.1
-        if acceleration <= -tol:
-            return acceleration * 9.82
-        elif acceleration > -tol and acceleration < tol:
-            return 0
-        else:
-            return acceleration * 9.82
-    
 
     def plot_car(self):
         
@@ -121,19 +115,17 @@ class Car:
 
 
     def drive(self):
-        
         acceleration = self.get_acceleration(self.iteration) if self.velocity < self.vmax else 0
         self.wheel_angle, self.target_id, self.crosstrack_error = self.tracker.stanley_control(self.x, self.y, self.yaw, self.velocity, self.wheel_angle)
         self.x, self.y, self.yaw, self.velocity, _, _ = self.model.update(self.x, self.y, self.yaw, self.velocity, acceleration, self.wheel_angle)
         
-        if self.target_id == self.prev_target_id:
+        if self.target_id == self.prev_target_id and self.iteration * self.delta_time > 0.25 * self.max_time:
             self.continue_animation = False
 
         self.prev_target_id = self.target_id
         self.iteration += 1
 
         self.all_crosstrack_errors.append(self.crosstrack_error)
-        print(f"Cross-track term: {self.crosstrack_error}{' '*10}", end="\r")
 
 
 @dataclass
@@ -188,7 +180,7 @@ def animate(frame, fargs):
     annotation.set_text(f'{car.x:.1f}, {car.y:.1f}')
     annotation.set_position((car.x, car.y + 5))
 
-    plt.title(f'{sim.dt*frame:.2f}s', loc='right')
+    plt.title(f'{sim.dt*car.iteration:.2f}s', loc='right')
     plt.xlabel(f'Speed: {car.velocity:.2f} m/s', loc='left')
     # plt.savefig(f'image/visualisation_{frame:03}.png', dpi=300)
 
