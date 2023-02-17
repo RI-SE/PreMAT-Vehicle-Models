@@ -119,7 +119,8 @@ class Car:
         self.wheel_angle, self.target_id, self.crosstrack_error = self.tracker.stanley_control(self.x, self.y, self.yaw, self.velocity, self.wheel_angle)
         self.x, self.y, self.yaw, self.velocity, _, _ = self.model.update(self.x, self.y, self.yaw, self.velocity, acceleration, self.wheel_angle)
         
-        if self.target_id == self.prev_target_id and self.iteration * self.delta_time > 0.25 * self.max_time:
+        if self.target_id == self.prev_target_id and self.iteration * self.delta_time > 0.25 * self.max_time or self.crosstrack_error > 5:
+            self.crosstrack_error = np.nan
             self.continue_animation = False
 
         self.prev_target_id = self.target_id

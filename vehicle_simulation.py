@@ -62,7 +62,5 @@ class VehicleSimulation:
         while self.car.continue_animation:
             self.car.drive()
         
-        print(f"Sum, all cross-track terms: {sum(self.car.all_crosstrack_errors[0:-1])}")
-        print(f"Mean, all cross-track terms: {np.mean(self.car.all_crosstrack_errors[0:-1])}")
-        print(f"Standard deviation, all cross-track terms: {np.std(self.car.all_crosstrack_errors[0:-1])}")
+        return self.car.all_crosstrack_errors[0:-1]
 
