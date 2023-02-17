@@ -77,6 +77,7 @@ class Car:
         self.kyaw = 0.01
         self.ksteer = 0.0
         self.crosstrack_error = None
+        self.all_crosstrack_errors = []
         self.target_id = None
         self.prev_target_id = None
         self.iteration = 0
@@ -116,7 +117,7 @@ class Car:
 
     def gen(self):
         while self.continue_animation:
-            yield len(self.acceleration)
+            yield self.delta_time * self.iteration
 
 
     def drive(self):
@@ -131,6 +132,7 @@ class Car:
         self.prev_target_id = self.target_id
         self.iteration += 1
 
+        self.all_crosstrack_errors.append(self.crosstrack_error)
         print(f"Cross-track term: {self.crosstrack_error}{' '*10}", end="\r")
 
 
