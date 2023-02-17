@@ -57,19 +57,24 @@ def box_plot(data: dict, title: str):
 
     ax.legend(handles = legend, loc = "upper left")
     ax.set_title(title)
-    
-    plt.show()
-
 
 
 if __name__ == '__main__':
 
-    data = ["data/data1.csv", "data/data3.csv", "data/data5.csv"]
+    data = ["data1.csv", "data3.csv", "data5.csv"]
     models = ["BicycleModel", "DubinsCar"]
-    vmax_range = np.linspace(3, 4, 15).tolist()
+    vmax_range = np.linspace(3, 4, 8).tolist()
 
+    mean_values, std_values = calculate_errors(data, models, vmax_range, True)
+    box_plot(mean_values, "Mean values, with acceleration")
+    box_plot(std_values, "Standard deviations, with acceleration")
+    
     mean_values, std_values = calculate_errors(data, models, vmax_range, False)
-    box_plot(mean_values, "Mean values")
+    box_plot(mean_values, "Mean values, constant velocity")
+    box_plot(std_values, "Standard deviations, constant velocity")
+    
+
+    plt.show()
 
     # For showing an animation of a simulation
     # sim = VehicleSimulation("data/data5.csv", "DubinsCar", 3.75, True)

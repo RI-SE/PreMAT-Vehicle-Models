@@ -27,7 +27,7 @@ class Path:
     def __init__(self, file: str):
 
         # Get path to waypoints.csv
-        with open(file, newline='') as f:
+        with open("data/" + file, newline='') as f:
             rows = list(reader(f, delimiter=','))
 
         ds = 0.05
